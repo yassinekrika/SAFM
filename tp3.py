@@ -18,12 +18,12 @@ def cacher_message(image, message):
             r, g, b, = donnees[x, y]
 
             r = r & 254 | int(message[index_message])
-            g = g & 254 | int(message[index_message])
-            b = b & 254 | int(message[index_message])
+
+            donnees[x, y] = r, g, b
             index_message += 1
 
             if index_message == len(message):
-                image.save('image_cache.jpg')
+                image.save('image_cache.bmp')
                 return image
     
     return None
@@ -39,8 +39,7 @@ def extraire_message(image):
         for y in range(hauteur):
             r, g, b = donnees[x, y]
             message += str(r & 1)
-            message += str(g & 1)
-            message += str(b & 1)
+
             index_message += 1
 
             if index_message >= 16 and message[-16:] == "1111111111111110":
@@ -50,5 +49,5 @@ def extraire_message(image):
 
 cacher_message(image, message_binaire)
 
-message_extraire = extraire_message(Image.open('image_cache.jpg'))
-print('secret message', message_extraire)
+message_extraire = extraire_message(Image.open('image_cache.bmp'))
+print('secret message : ', message_extraire)
