@@ -21,9 +21,11 @@ def encode_lsb(original_image_path, secret_image_path, password):
 
             secret_pixel = list(secret_image.getpixel((x, y)))
 
-            for i in range(3):  
+            for i in range(3):  # Pour chaque composant RVB
                 if key[x % len(key)] == '1':
                     original_pixel[i] = (original_pixel[i] & 0xFE) | ((secret_pixel[i] >> 7) & 0x01)
+                else:
+                    original_pixel[i] = (original_pixel[i] & 0xFE) | ((secret_pixel[i] >> 6) & 0x01)
 
             encoded_image.putpixel((x, y), tuple(original_pixel))
 
@@ -40,17 +42,19 @@ def decode_lsb(encoded_image_path, password):
         for y in range(encoded_image.height):
             encoded_pixel = list(encoded_image.getpixel((x, y)))
 
-
-            for i in range(3):  # Pour chaque composant RVB
-                if key[x % len(key)] == '1':
-                    encoded_pixel[i] = (encoded_pixel[i] & 0x01) << 7
-
             # r = (r & 1) << 7 
             # g = (g & 1) << 7
             # b = (b & 1) << 7
 
-            decoded_image.putpixel((x, y), tuple(encoded_pixel))
+            for i in range(3):  # Pour chaque composant RVB
+                if key[x % len(key)] == '1':
+                    encoded_pixel[i] = (encoded_pixel[i] & 0x01) << 7
+                else:
+                    encoded_pixel[i] = (encoded_pixel[i] & 0x01) << 6
 
+            decoded_image.putpixel((x, y), tuple(encoded_pixel))
+            
+           
     decoded_image.save('decoded_image.png')
 
 def encode_lsb2(original_image_path, secret_image_path, password):
