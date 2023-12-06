@@ -1,6 +1,41 @@
 from PIL import Image
 import numpy as np
 
+
+def divide_image(image, n):
+    groups = [image[i:i + n] for i in range(0, len(image), n)]
+    return groups
+
+def discrimination_function(pixel_group):
+    return sum(pixel_group)
+
+def reversible_permutation(pixel_group, mask):
+    return np.multiply(pixel_group, mask)
+
+def classify_pixel_group(group, threshold):
+    if group < -threshold:
+        return "Set A"
+    elif group > threshold:
+        return "Set B"
+    else:
+        return "Set C"
+
+def F1(pixel_group):
+    # Reversible permutation function F1
+    return [(pixel + 1) % 256 if pixel % 2 == 0 else (pixel - 1) % 256 for pixel in pixel_group]
+
+def F_minus_1(pixel_group):
+    # Reversible permutation function F-1
+    return [(pixel + 1) % 256 if pixel < 255 else 0 for pixel in pixel_group]
+
+def F0(pixel_group):
+    # Reversible permutation function F0
+    return pixel_group
+
+def negate_mask(mask):
+    # Calculate the negated mask −M
+    return [-pixel for pixel in mask]
+
 img = Image.open('/home/yassg4mer/Project/SAFM/bikes.bmp')
 
 img_gray_scale = img.convert('L')
@@ -9,37 +44,22 @@ img_matrix = np.array(img_gray_scale)
 
 rows, cols = img_matrix.shape
 
-block_size = 4
-abs_total = []
+n = 4
 
-def absolute(block):
-    abs = 0
-    for n in range(0, len(block) - 1):
-        abs += np.abs(block[n + 1] - block[n])
-    return abs
+# Q1
+groups = divide_image(img_matrix, n)
 
-def f1(x): 
-    if x % 2 == 0:
-        x += 1
-    else: 
-        x -= 1
+# Q2
+discriminated_values = [discrimination_function(group) for group in groups]
 
-    return x
-    
-def f0(x): 
-    return x
+# Q3
+mask = np.random.randint(-1, 2, size=n)  
+pixel_group = [i for i in range(0, 256, 2)]
 
-for i in range(0, rows, block_size):
-    for j in range(0, cols):
-        block = img_matrix[i:i + block_size, j]
-        
-        abs = absolute(block)
-        
-        abs_f1 = f1(abs)
-        
-        abs_f0 = f0(abs)
+permuted_F1 = F1(pixel_group)
+permuted_F_minus_1 = F_minus_1(pixel_group)
+permuted_F0 = F0(pixel_group)
 
+negated_mask = negate_mask(mask) 
 
-        abs_total.append(abs)
-        
-
+print(discriminated_values)
