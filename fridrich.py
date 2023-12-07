@@ -43,7 +43,7 @@ def F0(pixel_group):
 def negate_mask(mask):
     return np.array([-pixel for pixel in mask])
 
-img = Image.open('/home/yassg4mer/Project/SAFM/fille1.jpg')
+img = Image.open('/home/yassg4mer/Project/SAFM/decoded_image.png')
 img_gray_scale = img.convert('L')
 img_matrix = np.array(img_gray_scale)
 
@@ -55,17 +55,15 @@ print(rows, cols)
 groups = divide_image(img_matrix, n)
 discriminated_values = [discrimination_function(group) for group in groups]
 
+
+print(discriminated_values)
+
 mask = np.random.randint(-1, 2, size=n)
+negate_mask = negate_mask(mask)
 
-# print(mask)
-# print(-mask)
+# apply mask to each group
 
-# permuted_F1 = F1(groups)
-# permuted_F_minus_1 = F_minus_1(groups)
-# permuted_F0 = F0(groups)
-
-# for each group of 4 pixels in the image 
-# permute the pixels using the mask
+    
 
 vector = []
 vector_minus_m = []
@@ -95,15 +93,16 @@ for i in range(len(groups)):
         else:
             block[s] = F0(block[s])
 
-        if -mask[s] == 1:
+        if negate_mask[s] == 1:
             block_minus_m[s] = F1(block[s])
-        elif -mask[s] == -1:
+        elif negate_mask[s] == -1:
             block_minus_m[s] = F_minus_1(block[s])
         else:
             block_minus_m[s] = F0(block[s])
 
     vector.append(f(block))
     vector_minus_m.append(f(block_minus_m))
+
     ffx = f(block)
     ffx_minus_m = f(block_minus_m)
 
@@ -124,6 +123,6 @@ for i in range(len(groups)):
 
 print('R R_m ', len(R), len(R_m))
 print('S S_m ', len(S), len(S_m))
-# print(len(U))
+print('U U_m ', len(U), len(U_m))
     
     
